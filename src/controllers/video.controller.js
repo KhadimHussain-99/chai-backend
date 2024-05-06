@@ -33,28 +33,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     );
   }
 
-  const owner = await User.aggregate([
-    {
-      $match: {
-        _id: new mongoose.Types.ObjectId(req.user._id),
-      },
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "owner",
-        foreignField: "_id",
-        as: "owner",
-      },
-    },
-    {
-      $project: {
-        fullName: 1,
-        username: 1,
-        email: 1,
-      },
-    },
-  ]);
+  const owner = req.user._id;
 
   const video = await Video.create({
     title,
@@ -62,7 +41,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     thumbnail: thumbnail.url,
     videoFile: cloudinaryVideo.url,
     duration: cloudinaryVideo.duration,
-    owner: owner[0],
+    owner,
   });
 
   const createdVideo = await Video.findById(video._id);
